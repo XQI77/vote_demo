@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"fmt"
 
 	"vote-demo/grpcserve/internal/svc"
 	"vote-demo/grpcserver/pb/vote-demo/grpcserver/pb"
@@ -23,9 +24,15 @@ func NewGetUserVotesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetU
 	}
 }
 
-// 查询某用户已投的话题（用于前端回显状态）
 func (l *GetUserVotesLogic) GetUserVotes(in *pb.GetUserVotesRequest) (*pb.GetUserVotesResponse, error) {
-	// todo: add your logic here and delete this line
+	if in.UserId == "" {
+		return &pb.GetUserVotesResponse{}, nil
+	}
 
-	return &pb.GetUserVotesResponse{}, nil
+	userKey := fmt.Sprintf("vote:user:%s", in.UserId)
+	topics, err := l.svcCtx.Redis.SmembersCtx(l.ctx, userKey)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.GetUserVotesResponse{VotedTopics: topics}, nil
 }
