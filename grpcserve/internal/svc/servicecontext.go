@@ -1,11 +1,6 @@
-// Code scaffolded by goctl. Safe to edit.
-// goctl 1.9.2
-
 package svc
 
-import (
-	"vote-demo/greet/internal/config"
-)
+import "vote-demo/grpcserve/internal/config"
 
 type ServiceContext struct {
 	Config config.Config
