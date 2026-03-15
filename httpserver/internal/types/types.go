@@ -3,10 +3,35 @@
 
 package types
 
-type Request struct {
-	Name string `path:"name,options=you|me"`
+type GetResultsResponse struct {
+	Results []TopicResult `json:"results"`
 }
 
-type Response struct {
-	Message string `json:"message"`
+type GetUserVotesResponse struct {
+	VotedTopics []string `json:"voted_topics"`
+}
+
+type RevokeRequest struct {
+	Topics []string `json:"topics"`
+}
+
+type RevokeResponse struct {
+	Success bool          `json:"success"`
+	Message string        `json:"message"`
+	Results []TopicResult `json:"results"`
+}
+
+type TopicResult struct {
+	Topic string `json:"topic"`
+	Count int64  `json:"count"`
+}
+
+type VoteRequest struct {
+	Topics []string `json:"topics"`
+}
+
+type VoteResponse struct {
+	Success bool          `json:"success"`
+	Message string        `json:"message"`
+	Results []TopicResult `json:"results"`
 }

@@ -1,15 +1,60 @@
 syntax = "v1"
 
-type Request {
-	Name string `path:"name,options=you|me"`
+// ─── 请求/响应类型 ─────────────────────────────────────────────
+// 单个话题的票数
+type TopicResult {
+	Topic string `json:"topic"`
+	Count int64  `json:"count"`
 }
 
-type Response {
-	Message string `json:"message"`
+// 投票请求：Body 中携带话题列表，Header 中携带 X-User-Id
+type VoteRequest {
+	Topics []string `json:"topics"`
 }
 
-service httpserver-api {
-	@handler HttpserverHandler
-	get /from/:name (Request) returns (Response)
+type VoteResponse {
+	Success bool          `json:"success"`
+	Message string        `json:"message"`
+	Results []TopicResult `json:"results"`
+}
+
+// 撤销投票请求：Topics 为空则撤销全部
+type RevokeRequest {
+	Topics []string `json:"topics"`
+}
+
+type RevokeResponse {
+	Success bool          `json:"success"`
+	Message string        `json:"message"`
+	Results []TopicResult `json:"results"`
+}
+
+// 查询票数响应
+type GetResultsResponse {
+	Results []TopicResult `json:"results"`
+}
+
+// 查询用户已投话题响应
+type GetUserVotesResponse {
+	VotedTopics []string `json:"voted_topics"`
+}
+
+// ─── 路由定义 ──────────────────────────────────────────────────
+service vote-api {
+	// 投票（Header: X-User-Id 标识用户）
+	@handler VoteHandler
+	post /vote (VoteRequest) returns (VoteResponse)
+
+	// 撤销投票（Header: X-User-Id 标识用户）
+	@handler RevokeHandler
+	post /vote/revoke (RevokeRequest) returns (RevokeResponse)
+
+	// 查询所有话题实时票数
+	@handler GetResultsHandler
+	get /results returns (GetResultsResponse)
+
+	// 查询指定用户已投的话题（Header: X-User-Id）
+	@handler GetUserVotesHandler
+	get /user/votes returns (GetUserVotesResponse)
 }
 
