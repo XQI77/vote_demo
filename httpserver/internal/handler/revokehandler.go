@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -19,8 +20,8 @@ func RevokeHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
-
-		l := logic.NewRevokeLogic(r.Context(), svcCtx)
+		ctx := context.WithValue(r.Context(), svc.UserIdKey, r.Header.Get("X-User-Id"))
+		l := logic.NewRevokeLogic(ctx, svcCtx)
 		resp, err := l.Revoke(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)

@@ -6,6 +6,7 @@ package logic
 import (
 	"context"
 
+	"vote-demo/grpcserve/voteservice"
 	"vote-demo/httpserver/internal/svc"
 	"vote-demo/httpserver/internal/types"
 
@@ -27,7 +28,28 @@ func NewRevokeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RevokeLogi
 }
 
 func (l *RevokeLogic) Revoke(req *types.RevokeRequest) (resp *types.RevokeResponse, err error) {
-	// todo: add your logic here and delete this line
+	userId, _ := l.ctx.Value(svc.UserIdKey).(string)
+	if userId == "" {
+		return &types.RevokeResponse{Success: false, Message: "missing X-User-Id header"}, nil
+	}
 
-	return
+	rpcResp, err := l.svcCtx.VoteService.Revoke(l.ctx, &voteservice.RevokeRequest{
+		UserId: userId,
+		Topics: req.Topics,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	result := &types.RevokeResponse{
+		Success: rpcResp.Success,
+		Message: rpcResp.Message,
+	}
+	for _, r := range rpcResp.Results {
+		result.Results = append(result.Results, types.TopicResult{
+			Topic: r.Topic,
+			Count: r.Count,
+		})
+	}
+	return result, nil
 }

@@ -6,6 +6,7 @@ package logic
 import (
 	"context"
 
+	"vote-demo/grpcserve/voteservice"
 	"vote-demo/httpserver/internal/svc"
 	"vote-demo/httpserver/internal/types"
 
@@ -27,7 +28,17 @@ func NewGetUserVotesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetU
 }
 
 func (l *GetUserVotesLogic) GetUserVotes() (resp *types.GetUserVotesResponse, err error) {
-	// todo: add your logic here and delete this line
+	userId, _ := l.ctx.Value(svc.UserIdKey).(string)
+	if userId == "" {
+		return &types.GetUserVotesResponse{}, nil
+	}
 
-	return
+	rpcResp, err := l.svcCtx.VoteService.GetUserVotes(l.ctx, &voteservice.GetUserVotesRequest{
+		UserId: userId,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.GetUserVotesResponse{VotedTopics: rpcResp.VotedTopics}, nil
 }

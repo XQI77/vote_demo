@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -19,8 +20,8 @@ func VoteHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
-
-		l := logic.NewVoteLogic(r.Context(), svcCtx)
+		ctx := context.WithValue(r.Context(), svc.UserIdKey, r.Header.Get("X-User-Id"))
+		l := logic.NewVoteLogic(ctx, svcCtx)
 		resp, err := l.Vote(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)

@@ -6,6 +6,7 @@ package logic
 import (
 	"context"
 
+	"vote-demo/grpcserve/voteservice"
 	"vote-demo/httpserver/internal/svc"
 	"vote-demo/httpserver/internal/types"
 
@@ -27,7 +28,17 @@ func NewGetResultsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetRes
 }
 
 func (l *GetResultsLogic) GetResults() (resp *types.GetResultsResponse, err error) {
-	// todo: add your logic here and delete this line
+	rpcResp, err := l.svcCtx.VoteService.GetResults(l.ctx, &voteservice.GetResultsRequest{})
+	if err != nil {
+		return nil, err
+	}
 
-	return
+	result := &types.GetResultsResponse{}
+	for _, r := range rpcResp.Results {
+		result.Results = append(result.Results, types.TopicResult{
+			Topic: r.Topic,
+			Count: r.Count,
+		})
+	}
+	return result, nil
 }

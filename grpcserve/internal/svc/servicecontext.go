@@ -14,6 +14,6 @@ type ServiceContext struct {
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config: c,
-		Redis:  redis.MustNewRedis(c.Redis),
+		Redis:  redis.MustNewRedis(c.Store),
 	}
 }
