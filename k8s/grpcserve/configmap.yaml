@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grpcserve-config
+  namespace: vote-demo
+data:
+  vote.yaml: |
+    Name: vote.rpc
+    ListenOn: 0.0.0.0:8080
+    Mode: pro
+
+    Store:
+      Host: redis:6379
+      Type: node
+
+    Topics:
+      - Go
+      - Kubernetes
+      - AI

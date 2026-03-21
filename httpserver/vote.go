@@ -6,6 +6,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 
 	"vote-demo/httpserver/internal/config"
 	"vote-demo/httpserver/internal/handler"
@@ -15,7 +16,7 @@ import (
 	"github.com/zeromicro/go-zero/rest"
 )
 
-var configFile = flag.String("f", "etc/vote-api.yaml", "the config file")
+var configFile = flag.String("f", "etc/httpserver-api.yaml", "the config file")
 
 func main() {
 	flag.Parse()
@@ -28,6 +29,13 @@ func main() {
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
+
+	// 静态文件服务：前端页面
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    "/",
+		Handler: http.FileServer(http.Dir("static")).ServeHTTP,
+	})
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()
